@@ -1,0 +1,12 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  guardian-ai:
+    build: .
+    container_name: guardian_ai_app
+    restart: always
+    ports:
+      - "80:8501" # Mapeia a porta 80 do host para a 8501 do container
+    volumes:
+      - .:/app # Monta o diretório atual para desenvolvimento (hot-reload)
