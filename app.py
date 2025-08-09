@@ -19,8 +19,8 @@ st.set_page_config(
     layout="wide",
 )
 
-# Dicionário centralizado para o tema da aplicação
-APP_THEME = {
+# Dicionários de tema para light e dark mode
+LIGHT_THEME = {
     "primary": "#1976D2",
     "secondary": "#2196F3", 
     "danger": "#D32F2F",
@@ -37,6 +37,34 @@ APP_THEME = {
     "accent": "#7B1FA2",
     "highlight": "#F57C00"
 }
+
+DARK_THEME = {
+    "primary": "#2196F3",
+    "secondary": "#1976D2", 
+    "danger": "#F44336",
+    "warning": "#FF9800",
+    "success": "#4CAF50",
+    "info": "#00BCD4",
+    "background": "#121212",
+    "widget_background": "#1E1E1E",
+    "secondary_background": "#2D2D2D",
+    "text": "#FFFFFF",
+    "text_secondary": "#B3B3B3",
+    "subtle_text": "#8A8A8A",
+    "grid": "#3D3D3D",
+    "accent": "#9C27B0",
+    "highlight": "#FF9800"
+}
+
+# Function to get current theme
+def get_current_theme():
+    # Initialize theme in session state if not exists
+    if 'dark_mode' not in st.session_state:
+        st.session_state.dark_mode = False
+    return DARK_THEME if st.session_state.dark_mode else LIGHT_THEME
+
+# Set current theme
+APP_THEME = get_current_theme()
 
 # CSS Personalizado que utiliza as variáveis do tema
 st.markdown(f"""
@@ -232,6 +260,39 @@ st.markdown(f"""
     
     .stSlider > div > div > div {{
         background-color: var(--primary-color);
+    }}
+    
+    /* Dark mode improvements */
+    .stMarkdown, .stMarkdown p {{
+        color: var(--text-color) !important;
+    }}
+    
+    .stDataFrame {{
+        background-color: var(--widget-background-color) !important;
+        color: var(--text-color) !important;
+    }}
+    
+    .stSidebar {{
+        background-color: var(--secondary-background) !important;
+    }}
+    
+    /* Theme toggle button styling */
+    .stButton > button[key="theme_toggle"] {{
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        color: white;
+        border: none;
+        font-weight: 600;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }}
+    
+    .stButton > button[key="theme_toggle"]:hover {{
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        transform: translateY(-2px);
+    }}
+    
+    /* Smooth transitions for theme changes */
+    * {{
+        transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     }}
 </style>
 """, unsafe_allow_html=True)
@@ -552,7 +613,18 @@ if 'live_transactions' not in st.session_state:
     st.session_state.live_transactions = []
 
 # --- Cabeçalho ---
-st.title("GuardianAI: Plataforma de Análise de Risco")
+# Header with theme toggle
+header_col1, header_col2 = st.columns([4, 1])
+
+with header_col1:
+    st.title("GuardianAI: Plataforma de Análise de Risco")
+
+with header_col2:
+    # Theme toggle button
+    theme_label = "🌙 Modo Escuro" if not st.session_state.dark_mode else "☀️ Modo Claro"
+    if st.button(theme_label, key="theme_toggle", use_container_width=True):
+        st.session_state.dark_mode = not st.session_state.dark_mode
+        st.rerun()
 
 # Adicionar estado para simular dados dinâmicos
 if 'system_stats' not in st.session_state:
